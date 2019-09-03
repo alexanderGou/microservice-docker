@@ -1,0 +1,15 @@
+version: '3'
+services:
+  user-service:
+    image: microservice/user-service:0.0.1-SNAPSHOT
+    hostname: user-service
+    ports:
+      - "8750:8750"
+    container_name: ms-user-service
+    networks:
+      - ms-net
+    env_file: ms.env
+    external_links:
+      - mysql-common
+networks:
+  ms-net
