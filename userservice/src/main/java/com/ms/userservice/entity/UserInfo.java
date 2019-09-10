@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class UserInfo {
     @Id
     @JsonIgnore
-    private Long id;
+    private String id;
     private String userName;
     private Long tel;
     private int sex;

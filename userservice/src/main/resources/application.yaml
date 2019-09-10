@@ -3,15 +3,16 @@ spring:
   application:
     name: user-service
   datasource:
-    username: ${MYSQL_USER_NAME}
-    password: ${MYSQL_PASSWORD}
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/microservice
+    username: ${MYSQL_USER_NAME:root}
+    password: ${MYSQL_PASSWORD:root}
+    url: jdbc:mysql://${MYSQL_HOST:192.168.0.102}:${MYSQL_PORT:6606}/microservice
     driver-class-name: com.mysql.jdbc.Driver
   jpa:
     database: mysql
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 eureka:
   instance:
     hostname: 192.168.0.102
@@ -19,7 +20,7 @@ eureka:
 #    fetch-registry: true
 #    register-with-eureka: true
     service-url:
-      defaultZone: http://${EUREKA_ZONE_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+      defaultZone: http://${EUREKA_ZONE_HOST:192.168.0.102}:${EUREKA_PORT:8761}/eureka/
 server:
   port: 8750
 #    service-url: http://${EUREKA_ZONE_HOST:localhost}:${EUREKA_PORT:8761}/eureka/

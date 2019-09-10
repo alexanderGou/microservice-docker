@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class UserController {
@@ -23,6 +24,7 @@ public class UserController {
     }
     @PostMapping("/user")
     public ResponseEntity<UserInfo> addUser(@RequestBody UserInfo userInfo) {
+        userInfo.setId(UUID.randomUUID().toString());
         return ResponseEntity.ok(userRepo.save(userInfo));
     }
 }
