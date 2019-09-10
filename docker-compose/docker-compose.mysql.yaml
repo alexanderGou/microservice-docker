@@ -1,0 +1,30 @@
+version: '3'
+services:
+  ms_mysql_common:
+    image: mysql:5.7
+    container_name: ms_mysql_common # 容器名
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci #设置utf8字符集
+    hostname: ms_mysql_common
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root #root管理员用户密码
+      MYSQL_USER: test   #创建test用户
+      MYSQL_PASSWORD: test  #设置test用户的密码
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABSE: microservice
+    ports:
+      - '6606:3306'  #host物理直接映射端口为6606
+    volumes:
+      #mysql数据库挂载到host物理机目录/e/docker/mysql/data/db
+      - "/data/mysql/db:/var/lib/mysql"
+      #容器的配置目录挂载到host物理机目录/e/docker/mysql/data/conf
+      - "/data/mysql/config:/etc/mysql/conf.d"
+      - "/data/mysql/init:/docker-entrypoint-initdb.d"
+    networks:
+      ms_mysql_common:
+        aliases:
+          - ms_mysql_common
+networks:
+  ms_mysql_common:
+    external:
+      name: ms_ms-net

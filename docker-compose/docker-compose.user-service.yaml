@@ -1,0 +1,34 @@
+version: '3'
+services:
+  ms_user-service:
+    image: microservice/user-service:0.0.1-SNAPSHOT
+    hostname: user-service
+    restart: always
+    ports:
+      - "8750:8750"
+    container_name: ms_user-service
+    networks:
+      - ms_mysql_common
+      - eureka-server
+    env_file: ms.env
+    depends_on:
+      - ms_mysql_common
+      - ms_eureka
+#    links:
+#      - ms_mysql_common:db
+#      - ms_eureka:registor
+#    dns_search:
+#      - eureka-server
+#      - ms_mysql_common
+#networks:
+#     external:
+#       name: ms_ms-net
+#
+#
+networks:
+  ms_mysql_common:
+    external:
+      name: ms_ms-net
+  eureka-server:
+    external:
+      name: ms_ms-net

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class UserController {
         return ResponseEntity.ok(userRepo.findAll());
     }
     @PostMapping("/user")
-    public ResponseEntity<UserInfo> addUser(UserInfo userInfo) {
+    public ResponseEntity<UserInfo> addUser(@RequestBody UserInfo userInfo) {
         return ResponseEntity.ok(userRepo.save(userInfo));
     }
 }

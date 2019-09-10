@@ -11,11 +11,13 @@ spring:
     database: mysql
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
 eureka:
+  instance:
+    hostname: 192.168.0.102
   client:
-    fetch-registry: true
-    register-with-eureka: true
+#    fetch-registry: true
+#    register-with-eureka: true
     service-url:
       defaultZone: http://${EUREKA_ZONE_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
 server:

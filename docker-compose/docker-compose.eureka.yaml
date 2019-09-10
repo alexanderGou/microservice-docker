@@ -1,14 +1,16 @@
 version: '3'
 services:
-  eureka1:
+  ms_eureka:
     image: microservice/register:0.0.1-SNAPSHOT
     restart: always
     hostname: eureka-server
     ports:
       - "8761:8761"
-    container_name: ms-eureka
+    container_name: ms_eureka
     networks:
-      - ms-net
+      - eureka-server
     env_file: ms.env
 networks:
-  ms-net
+  eureka-server:
+    external:
+      name: ms_ms-net

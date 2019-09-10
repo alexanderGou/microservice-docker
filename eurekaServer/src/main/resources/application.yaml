@@ -3,6 +3,8 @@ server:
   port: ${EUREKA_PORT:8761}
 
 eureka:
+  instance:
+    hostname: ms_eureka
   client:
     register-with-eureka: false
     fetch-registry: false
