@@ -1,61 +1,67 @@
-#version: '3'
-#services:
-#  elasticsearch:
-#    image: elasticsearch:5.6-alpine
-#    container_name: sc-elasticsearch
-#    restart: always
-#    env_file: ms.env
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
-#    volumes:
-#      - ./data/elasticsearch/data:/usr/share/elasticsearch/data
-#      - ./data/elasticsearch/logs:/usr/share/elasticsearch/logs
-#      - ./data/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-#    networks:
-#      - ms_devops
-#    ports:
-#      - 9200:9200
-#      - 9300:9300
-#
-#networks:
-#  eureka-server:
-#    external:
-#      name: ms_ms-net
-version: "3"
+version: '3' #版本号 https://www.docker.elastic.co/#
 services:
-  elasticsearch:
-    image: docker.io/elasticsearch:5.6.5
-    environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    volumes:
-      - ./elasticsearch/data:/usr/share/elasticsearch/data
-    container_name: elasticsearch565
-    hostname: elasticsearch
-    restart: always
+  es01: #服务名称（不是容器名,名称最好不要含有特殊字符，碰到过用下划线时运行出错）    
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION} #使用的镜像 
+    container_name: elasticsearch01 #容器名称 
+    volumes: #挂载文件
+      - ./data/elasticsearch/logs/:/usr/share/logs/
+      - ./data/elasticsearch/data/data_01:/usr/share/elasticsearch/data
+      - ./data/elasticsearch/config/es01/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     ports:
-      - "9200:9200"
-      - "9300:9300"
-  kibana:
-    image: docker.io/kibana:5.6.5
+      - "9200:9200" #暴露的端口信息和docker run -d -p 80:80一样
+      - "9300:9300" 
+    restart: "always" #重启策略，能够使服务保持始终运行，生产环境推荐使用
+    env_file: ms.env #设置镜像变量，它可以保存变量到镜像里面
+    networks: #加入指定网络
+      - elk
+  es02: #服务名称（不是容器名,名称最好不要含有特殊字符，碰到过用下划线时运行出错）    
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION} #使用的镜像 
+    container_name: elasticsearch01 #容器名称 
+    volumes: #挂载文件
+      - ./data/elasticsearch/logs/:/usr/share/logs/
+      - ./data/elasticsearch/data/data_02:/usr/share/elasticsearch/data
+      - ./data/elasticsearch/config/es02/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200" #暴露的端口信息和docker run -d -p 80:80一样
+      - "9300:9300" 
+    restart: "always" #重启策略，能够使服务保持始终运行，生产环境推荐使用
+    env_file: ms.env #设置镜像变量，它可以保存变量到镜像里面
+    networks: #加入指定网络
+      - elk
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
+    container_name: logstash01
+    volumes:
+      - ./data/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./data/logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - "5044:5044"
+      - "9600:9600"
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-    container_name: kibana565
-    hostname: kibana
-    depends_on:
-      - elasticsearch
-    restart: always
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - elk
+    depends_on: #标签解决了容器的依赖、启动先后的问题
+      - es01
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    container_name: kibana01
+    volumes:
+      - ./data/kibana/config/:/usr/share/kibana/config
     ports:
       - "5601:5601"
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:5.6.5
-    volumes:
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - ./log:/tmp
-    container_name: filebeat565
-    hostname: filebeat
-    restart: always
-    privileged: true
+    networks:
+      - elk
     depends_on:
-      - elasticsearch
+      - es01
+networks:
+  elk:
+    driver: bridge
