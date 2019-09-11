@@ -1,47 +1,57 @@
 version: '3' #版本号 https://www.docker.elastic.co/#
 services:
   es01: #服务名称（不是容器名,名称最好不要含有特殊字符，碰到过用下划线时运行出错）    
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION} #使用的镜像 
-    container_name: elasticsearch01 #容器名称 
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1 #使用的镜像 
+    container_name: es01 #容器名称 
     volumes: #挂载文件
-      - ./data/elasticsearch/logs/:/usr/share/logs/
-      - ./data/elasticsearch/data/data_01:/usr/share/elasticsearch/data
-      - ./data/elasticsearch/config/es01/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./../data/elasticsearch/logs/:/usr/share/logs/
+      - ./../data/elasticsearch/data/data_01:/usr/share/elasticsearch/data
+      - ./../data/elasticsearch/config/es01/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ulimits:
       memlock:
         soft: -1
         hard: -1
     ports:
-      - "9200:9200" #暴露的端口信息和docker run -d -p 80:80一样
-      - "9300:9300" 
+      - "9200:9200"#暴露的端口信息和docker run -d -p 80:80一样
+      - "9300:9300"
     restart: "always" #重启策略，能够使服务保持始终运行，生产环境推荐使用
-    env_file: ms.env #设置镜像变量，它可以保存变量到镜像里面
+    environment:
+      - node.name=es01
+      - discovery.seed_hosts=es02
+      - cluster.initial_master_nodes=es01,es02
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
     networks: #加入指定网络
       - elk
   es02: #服务名称（不是容器名,名称最好不要含有特殊字符，碰到过用下划线时运行出错）    
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION} #使用的镜像 
-    container_name: elasticsearch01 #容器名称 
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1 #使用的镜像 
+    container_name: es02 #容器名称 
     volumes: #挂载文件
-      - ./data/elasticsearch/logs/:/usr/share/logs/
-      - ./data/elasticsearch/data/data_02:/usr/share/elasticsearch/data
-      - ./data/elasticsearch/config/es02/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./../data/elasticsearch/logs/:/usr/share/logs/
+      - ./../data/elasticsearch/data/data_02:/usr/share/elasticsearch/data
+      - ./../data/elasticsearch/config/es02/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ulimits:
       memlock:
         soft: -1
         hard: -1
     ports:
-      - "9200:9200" #暴露的端口信息和docker run -d -p 80:80一样
-      - "9300:9300" 
-    restart: "always" #重启策略，能够使服务保持始终运行，生产环境推荐使用
-    env_file: ms.env #设置镜像变量，它可以保存变量到镜像里面
+      - "9201:9200"#暴露的端口信息和docker run -d -p 80:80一样
+      - "9301:9300"
+    restart: "always"#重启策略，能够使服务保持始终运行，生产环境推荐使用
+    environment:
+      - node.name=es02
+      - discovery.seed_hosts=es01
+      - cluster.initial_master_nodes=es01,es02
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
     networks: #加入指定网络
       - elk
   logstash:
-    image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
+    image: docker.elastic.co/logstash/logstash:7.3.1
     container_name: logstash01
     volumes:
-      - ./data/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./data/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./../data/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./../data/logstash/pipeline:/usr/share/logstash/pipeline
     ports:
       - "5044:5044"
       - "9600:9600"
@@ -52,10 +62,11 @@ services:
     depends_on: #标签解决了容器的依赖、启动先后的问题
       - es01
   kibana:
-    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    image: docker.elastic.co/kibana/kibana:7.3.1
     container_name: kibana01
+    env_file: ./../ms.env
     volumes:
-      - ./data/kibana/config/:/usr/share/kibana/config
+      - ./../data/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     ports:
       - "5601:5601"
     networks:

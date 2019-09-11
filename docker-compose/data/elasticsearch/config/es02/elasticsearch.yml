@@ -1,8 +1,8 @@
-node.name: es02
-discovery.seed_hosts: es01
-cluster.initial_master_nodes: es01,es02
+#node.name: es02
+#discovery.seed_hosts: es01
+#cluster.initial_master_nodes: es01,es02
 cluster.name: elasticsearch
-bootstrap.memory_lock: true
-ES_JAVA_OPTS: "-Xms256m -Xmx256m"
-ELASTIC_PASSWORD: root
+#bootstrap.memory_lock: true
+#ES_JAVA_OPTS: "-Xms256m -Xmx256m"
+#ELASTIC_PASSWORD: root
 network.host: 0.0.0.0
