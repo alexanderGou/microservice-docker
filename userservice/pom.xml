@@ -18,7 +18,7 @@
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.SR2</spring-cloud.version>
         <dockerfile-maven.version>1.4.10</dockerfile-maven.version>
-        <swagegr.version>2.8.0</swagegr.version>
+        <swagegr.version>2.10.0</swagegr.version>
     </properties>
 
     <dependencies>
